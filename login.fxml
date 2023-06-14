@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+
+<StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="419.0" prefWidth="634.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.LoginController">
+   <children>
+      <BorderPane prefHeight="200.0" prefWidth="200.0">
+         <left>
+            <AnchorPane prefHeight="436.0" prefWidth="348.0" BorderPane.alignment="CENTER">
+               <children>
+                  <ImageView fitHeight="459.0" fitWidth="428.0" layoutY="-2.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../crud/assets/logo.png" />
+                     </image>
+                  </ImageView>
+               </children>
+            </AnchorPane>
+         </left>
+         <right>
+            <AnchorPane prefHeight="426.0" prefWidth="214.0" style="-fx-background-color: #993399;" BorderPane.alignment="CENTER">
+               <children>
+                  <Text layoutX="78.0" layoutY="63.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Login" textAlignment="CENTER">
+                     <font>
+                        <Font size="23.0" />
+                     </font>
+                  </Text>
+                  <TextField id="nomeField" fx:id="nomeField" layoutX="22.0" layoutY="92.0" prefHeight="36.0" prefWidth="171.0" promptText="Nome" />
+                  <TextField id="senhaField" fx:id="senhaField" layoutX="22.0" layoutY="169.0" prefHeight="36.0" prefWidth="172.0" promptText="Senha" />
+                  <Button id="btnField" fx:id="btnField" layoutX="68.0" layoutY="250.0" mnemonicParsing="false" onAction="#irLogin" prefHeight="37.0" prefWidth="81.0" style="-fx-background-radius: 50px; -fx-background-color: #000000;" text="Button" textFill="WHITE" />
+               </children>
+            </AnchorPane>
+         </right>
+      </BorderPane>
+   </children>
+</StackPane>

@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="609.0" prefWidth="944.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.MenuController">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="609.0" prefWidth="944.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.ViagemController">
   <children>
     <SplitPane centerShape="false" dividerPositions="0.11587436332767402" focusTraversable="true" prefHeight="-1.0" prefWidth="-1.0" styleClass="window" VBox.vgrow="ALWAYS">
       <items>
@@ -31,23 +31,33 @@
                               <TableColumn fx:id="col_inicio" prefWidth="111.20001220703125" styleClass="rp-column" text="Inicio" />
                               <TableColumn fx:id="col_fim" prefWidth="75.0" styleClass="rp-column" text="Fim" />
                               <TableColumn fx:id="col_justificativa" prefWidth="75.0" styleClass="rp-column" text="Destino" />
-                              <TableColumn fx:id="col_motivo" prefWidth="75.0" styleClass="rp-column" text="Pagamento" />
+                             
                               <TableColumn fx:id="col_id" editable="false" prefWidth="93.6000394821167" styleClass="rp-column" text="ID" visible="false" />
                           </columns>
                            <columnResizePolicy>
                               <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                            </columnResizePolicy>
                         </TableView>
-                        <Label layoutX="258.0" layoutY="31.0" prefHeight="39.0" prefWidth="354.0" text="Cadastro de viagem" textFill="#c040ed">
+                        <Label layoutX="258.0" layoutY="31.0" prefHeight="39.0" prefWidth="354.0" text="Cadastro de viagem " textFill="#c040ed">
                            <font>
                               <Font size="27.0" />
                            </font>
                         </Label>
-                        <Button fx:id="btn_lancar" layoutX="618.0" layoutY="442.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="155.0" styleClass="MYButton" text="Lançar" />
-                        <TextField fx:id="inicio" layoutX="621.0" layoutY="165.0" />
-                        <TextField fx:id="fim" layoutX="621.0" layoutY="242.0" />
-                        <TextField fx:id="destino" layoutX="621.0" layoutY="316.0" />
-                        <TextField fx:id="pagamento" layoutX="621.0" layoutY="377.0" />
+                        <Button fx:id="btn_lancar" layoutX="607.0" layoutY="433.0" mnemonicParsing="false" onAction="#irLancar" prefHeight="52.0" prefWidth="186.0" style="-fx-background-color: c040ed; -fx-background-radius: 10%;" styleClass="MYButton" text="Lançar" />
+                        <TextField fx:id="inicio" layoutX="615.0" layoutY="167.0" prefHeight="38.0" prefWidth="170.0" promptText="Inicio" />
+                        <TextField fx:id="fim" layoutX="612.0" layoutY="242.0" prefHeight="38.0" prefWidth="174.0" promptText="Fim" />
+                        <TextField fx:id="destino" layoutX="611.0" layoutY="303.0" prefHeight="38.0" prefWidth="177.0" promptText="Destino" />
+                        <TextField fx:id="pagamento" layoutX="609.0" layoutY="364.0" prefHeight="38.0" prefWidth="179.0" promptText="Pagamento" />
+                        <Button fx:id="btn_lancar1" layoutX="64.0" layoutY="527.0" mnemonicParsing="false" onAction="#excluirLancamento" prefHeight="52.0" prefWidth="100.0" style="-fx-background-color: c040ed; -fx-background-radius: 10%;" styleClass="MYButton" text="Deletar">
+                           <font>
+                              <Font size="18.0" />
+                           </font>
+                        </Button>
+                        <Button fx:id="btn_lancar11" layoutX="181.0" layoutY="527.0" mnemonicParsing="false" onAction="#atualizarLancamento" prefHeight="52.0" prefWidth="100.0" style="-fx-background-color: c040ed; -fx-background-radius: 10%;" styleClass="MYButton" text="Atualizar">
+                           <font>
+                              <Font size="18.0" />
+                           </font>
+                        </Button>
               </children>
             </AnchorPane>
           </content>

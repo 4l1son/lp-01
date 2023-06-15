@@ -7,3 +7,10 @@
 /LoginController$Lugar.class
 /LoginController.class
 /MenuController.class
+/ViagemController.class
+/ViagemController$Lancamento.class
+/PessoaController$Pessoa.class
+/PessoaController.class
+/PessoaController$Lancamento.class
+/VeiculoController.class
+/VeiculoController$Lancamento.class

@@ -1,5 +1,6 @@
 package Controller;
 
+
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -18,64 +19,64 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
-public class ViagemController implements Initializable {
+
+
+public class PessoaController implements Initializable {
+
+    @FXML
+    private TextField CPF;
 
     @FXML
     private Button btn_lancar;
 
     @FXML
-    private TableColumn<Lancamento, String> col_fim;
+    private TableColumn<Lancamento, String> col_CPF;
 
     @FXML
     private TableColumn<Lancamento, String> col_id;
 
     @FXML
-    private TableColumn<Lancamento, String> col_inicio;
+    private TableColumn<Lancamento, String> col_idade;
 
     @FXML
-    private TableColumn<Lancamento, String> col_justificativa;
+    private TableColumn<Lancamento, String> col_nome;
 
     @FXML
-    private TableColumn<Lancamento, String> col_motivo;
+    private TextField idade;
 
     @FXML
-    private TextField destino;
-
-    @FXML
-    private TextField fim;
-
-    @FXML
-    private TextField inicio;
+    private TextField nome;
 
     @FXML
     private TableView<Lancamento> table_lancamento;
 
     private ObservableList<Lancamento> tableData;
 
+
     @FXML
     void irLancar(ActionEvent event) {
-        String destinoText = destino.getText();
-        String fimText = fim.getText();
-        String inicioText = inicio.getText();
+        String nomeText = nome.getText();
+        String idadeText = idade.getText();
+        String CPFText = CPF.getText();
 
         // Criar um objeto Lancamento com os dados fornecidos
-        Lancamento lancamento = new Lancamento(destinoText, fimText, inicioText);
+        Lancamento lancamento = new Lancamento(nomeText, idadeText, CPFText);
 
         // Adicionar o objeto Lancamento à lista observável
         tableData.add(lancamento);
 
         // Limpar os campos de entrada de texto
-        destino.clear();
-        fim.clear();
-        inicio.clear();
+        nome.clear();
+        idade.clear();
+        CPF.clear();
     }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         // Configurar as colunas da tabela
-        col_justificativa.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getDestino()));
-        col_inicio.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getInicio()));
-        col_fim.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getFim()));
+        col_nome.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getNome()));
+        col_idade.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getIdade()));
+        col_CPF.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getCPF()));
 
         // Criar uma lista observável para armazenar os dados da tabela
         tableData = FXCollections.observableArrayList();
@@ -83,46 +84,43 @@ public class ViagemController implements Initializable {
         // Atribuir a lista observável à tabela
         table_lancamento.setItems(tableData);
     }
-    
 
     // Classe Lancamento que representa uma linha de dados
     private static class Lancamento {
-        private final SimpleStringProperty destino;
-        private final SimpleStringProperty fim;
-        private final SimpleStringProperty inicio;
+        private final SimpleStringProperty nome;
+        private final SimpleStringProperty idade;
+        private final SimpleStringProperty CPF;
 
-        public Lancamento(String destino, String fim, String inicio) {
-            this.destino = new SimpleStringProperty(destino);
-            this.fim = new SimpleStringProperty(fim);
-            this.inicio = new SimpleStringProperty(inicio);
+        public Lancamento(String nome, String idade, String CPF) {
+            this.nome = new SimpleStringProperty(nome);
+            this.idade = new SimpleStringProperty(idade);
+            this.CPF = new SimpleStringProperty(CPF);
         }
 
-        public String getDestino() {
-            return destino.get();
+        public String getNome() {
+            return nome.get();
         }
 
-        public String getFim() {
-            return fim.get();
+        public String getIdade() {
+            return idade.get();
         }
 
-        public String getInicio() {
-            return inicio.get();
+        public String getCPF() {
+            return CPF.get();
+        }
+        public void setNome(String nomeText) {
+            nome.set(nomeText);
         }
 
-        public void setDestino(String novoDestino) {
-            destino.set(novoDestino);
+        public void setIdade(String idadeText) {
+            idade.set(idadeText);
         }
 
-        public void setFim(String novoFim) {
-            fim.set(novoFim);
-        }
-
-        public void setInicio(String novoInicio) {
-            inicio.set(novoInicio);
+        public void setCPF(String CPFText) {
+            CPF.set(CPFText);
         }
     }
     
-  
     @FXML
     public void irMenu() {
         // Carregar o arquivo FXML do menu
@@ -148,6 +146,7 @@ public class ViagemController implements Initializable {
             System.err.println(e);
         }
     }
+
     @FXML
     void excluirLancamento(ActionEvent event) {
         // Verificar se um item da tabela está selecionado
@@ -161,13 +160,14 @@ public class ViagemController implements Initializable {
             tableData.remove(selecionado);
 
             // Limpar os campos de entrada de texto
-            destino.clear();
-            fim.clear();
-            inicio.clear();
+            nome.clear();
+            idade.clear();
+            CPF.clear();
 
             
     }
-   
+    
+
     @FXML
     void atualizarLancamento(ActionEvent event) {
         // Verificar se um item da tabela está selecionado
@@ -179,28 +179,23 @@ public class ViagemController implements Initializable {
         }
 
         // Obter os novos valores dos campos de entrada de texto
-        String novoDestino = destino.getText();
-        String novoFim = fim.getText();
-        String novoInicio = inicio.getText();
+        String novoDestino = nome.getText();
+        String novoFim = idade.getText();
+        String novoInicio = CPF.getText();
 
         // Atualizar os valores do lançamento selecionado
-        selecionado.setDestino(novoDestino);
-        selecionado.setFim(novoFim);
-        selecionado.setInicio(novoInicio);
+        selecionado.setNome(novoDestino);
+        selecionado.setIdade(novoFim);
+        selecionado.setCPF(novoInicio);
 
         // Atualizar a tabela para refletir as alterações
         table_lancamento.refresh();
 
         // Limpar os campos de entrada de texto
-        destino.clear();
-        fim.clear();
-        inicio.clear();
+        nome.clear();
+        idade.clear();
+        CPF.clear();
     }
    
 
-
-
-
 }
-
-

@@ -1,12 +1,6 @@
 package Controller;
 
-import java.io.IOException;
-import java.net.URL;
-import java.util.ResourceBundle;
-
-
 import javafx.beans.property.SimpleStringProperty;
-
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -20,95 +14,142 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import Conexao.Factory;
+import java.io.IOException;
+import java.net.URL;
+import java.sql.*;
+import java.util.ResourceBundle;
 
 public class VeiculoController implements Initializable {
-
     @FXML
-    private TextField ano;
+    private TextField nome;
 
     @FXML
     private Button btn_lancar;
 
     @FXML
-    private TableColumn<?, ?> col_ano;
+    private TableColumn<Lancamento, String> col_nome;
 
     @FXML
-    private TableColumn<?, ?> col_modelo;
+    private TableColumn<Lancamento, String> col_id;
 
     @FXML
-    private TableColumn<?, ?> col_nome;
+    private TableColumn<Lancamento, String> col_ano;
 
     @FXML
-    private TextField modelo;
+    private TableColumn<Lancamento, String> col_porte;
 
     @FXML
-    private TextField nome;
+    private TextField porte;
 
     @FXML
-    private TableView<?> table_lancamento;
+    private TextField ano;
+
+    @FXML
+    private TableView<Lancamento> table_lancamento;
 
     private ObservableList<Lancamento> tableData;
-    
+
+    private Connection con;
+
     @FXML
     void irLancar(ActionEvent event) {
-    	String nomeText = nome.getText();
-        String modeloText = modelo.getText();
+        String nomeText = nome.getText();
+        String porteText = porte.getText();
         String anoText = ano.getText();
 
-        // Criar um objeto Lancamento com os dados fornecidos
-        Lancamento lancamento = new Lancamento(nomeText, modeloText, anoText);
+        try {
+            PreparedStatement stmt = con.prepareStatement("INSERT INTO veiculo (nome, porte, ano) VALUES (?, ?, ?)");
+            stmt.setString(1, nomeText);
+            stmt.setString(2, porteText);
+            stmt.setString(3, anoText);
+            stmt.executeUpdate();
+            stmt.close();
 
-        // Adicionar o objeto Lancamento à lista observável
-        tableData.add(lancamento);
+            // Criar um objeto Lancamento com os dados fornecidos
+            Lancamento lancamento = new Lancamento(nomeText, porteText, anoText);
 
-        // Limpar os campos de entrada de texto
-        nome.clear();
-        modelo.clear();
-        ano.clear();
+            // Adicionar o objeto Lancamento à lista observável
+            tableData.add(lancamento);
 
+            // Limpar os campos de entrada de texto
+            nome.clear();
+            porte.clear();
+            ano.clear();
+        } catch (SQLException e) {
+            System.err.println("Erro ao inserir lançamento: " + e.getMessage());
+        }
     }
-    
 
-	
-	  private static class Lancamento {
-	        private final SimpleStringProperty nome;
-	        private final SimpleStringProperty modelo;
-	        private final SimpleStringProperty ano;
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        Factory factory = new Factory();
+        con = factory.getConnection();
 
-	        public Lancamento(String nome, String modelo, String ano) {
-	            this.nome = new SimpleStringProperty(nome);
-	            this.modelo = new SimpleStringProperty(modelo);
-	            this.ano = new SimpleStringProperty(ano);
-	        }
+        // Configurar as colunas da tabela
+        col_nome.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getNome()));
+        col_porte.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getPorte()));
+        col_ano.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getAno()));
 
-	        public String getNome() {
-	            return nome.get();
-	        }
+        // Criar uma lista observável para armazenar os dados da tabela
+        tableData = FXCollections.observableArrayList();
 
-	        public String getModelo() {
-	            return modelo.get();
-	        }
+        try {
+            // Carregar os dados do banco para a lista observável
+            Statement stmt = con.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT * FROM veiculo");
+            while (rs.next()) {
+                String nomeText = rs.getString("nome");
+                String porteText = rs.getString("porte");
+                String anoText = rs.getString("ano");
+                Lancamento lancamento = new Lancamento(nomeText, porteText, anoText);
+                tableData.add(lancamento);
+            }
+            stmt.close();
+        } catch (SQLException e) {
+            System.err.println("Erro ao carregar lançamentos: " + e.getMessage());
+        }
 
-	        public String getAno() {
-	            return ano.get();
-	        }
-	    }
-	  
+        // Atribuir a lista observável à tabela
+        table_lancamento.setItems(tableData);
+    }
 
-		@Override
-		public void initialize(URL url, ResourceBundle resourceBundle) {
-			// Configurar as colunas da tabela
-			col_nome.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getNome()));
-	        col_modelo.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getModelo()));
-	        col_ano.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getAno()));
-	        
-	        // Criar uma lista observável para armazenar os dados da tabela
-	        tableData = FXCollections.observableArrayList();
+    // Classe Lancamento que representa uma linha de dados
+    private static class Lancamento {
+        private final SimpleStringProperty nome;
+        private final SimpleStringProperty porte;
+        private final SimpleStringProperty ano;
 
-	        // Atribuir a lista observável à tabela
-	        table_lancamento.setItems(tableData);
-		}
-		
+        public Lancamento(String nome, String porte, String ano) {
+            this.nome = new SimpleStringProperty(nome);
+            this.porte = new SimpleStringProperty(porte);
+            this.ano = new SimpleStringProperty(ano);
+        }
+
+        public String getNome() {
+            return nome.get();
+        }
+
+        public String getPorte() {
+            return porte.get();
+        }
+
+        public String getAno() {
+            return ano.get();
+        }
+
+        public void setNome(String nomeText) {
+            nome.set(nomeText);
+        }
+
+        public void setPorte(String porteText) {
+            porte.set(porteText);
+        }
+
+        public void setAno(String anoText) {
+            ano.set(anoText);
+        }
+    }
 
     @FXML
     public void irMenu() {
@@ -135,4 +176,75 @@ public class VeiculoController implements Initializable {
             System.err.println(e);
         }
     }
+
+    @FXML
+    void excluirLancamento(ActionEvent event) {
+        // Verificar se um item da tabela está selecionado
+        Lancamento selecionado = table_lancamento.getSelectionModel().getSelectedItem();
+        if (selecionado == null) {
+            // Nenhum item selecionado, exibir uma mensagem de erro ou aviso
+            System.out.println("Nenhum item selecionado.");
+            return;
+        }
+
+        try {
+            // Remover o objeto selecionado do banco de dados
+            PreparedStatement stmt = con.prepareStatement("DELETE FROM pessoa WHERE ano = ?");
+            stmt.setString(1, selecionado.getAno());
+            stmt.executeUpdate();
+            stmt.close();
+
+            // Remover o objeto selecionado da lista observável
+            tableData.remove(selecionado);
+
+            // Limpar os campos de entrada de texto
+            nome.clear();
+            porte.clear();
+            ano.clear();
+        } catch (SQLException e) {
+            System.err.println("Erro ao excluir lançamento: " + e.getMessage());
+        }
+    }
+    @FXML
+    void atualizarLancamento(ActionEvent event) {
+        // Verificar se uma pessoa da tabela está selecionada
+        Lancamento selecionada = table_lancamento.getSelectionModel().getSelectedItem();
+        if (selecionada == null) {
+            // Nenhuma pessoa selecionada, exibir uma mensagem de erro ou aviso
+            System.out.println("Nenhuma pessoa selecionada.");
+            return;
+        }
+
+        try {
+            // Obter os novos valores dos campos de entrada de texto
+            String novoNome = nome.getText();
+            String novoAno = ano.getText();
+            String novoPorte = porte.getText();
+
+            // Atualizar os valores da pessoa selecionada no banco de dados
+            PreparedStatement stmt = con.prepareStatement("UPDATE veiculo SET nome = ?, ano = ?, porte = ? WHERE porte = ?");
+            stmt.setString(1, novoNome);
+            stmt.setString(2, novoAno);
+            stmt.setString(3, novoPorte);
+            stmt.setString(4, selecionada.getPorte());
+            stmt.executeUpdate();
+            stmt.close();
+
+            // Atualizar os valores da pessoa selecionada na tabela
+            selecionada.setNome(novoNome);
+            selecionada.setAno(novoAno);
+            selecionada.setPorte(novoPorte);
+
+            // Atualizar a tabela para refletir as alterações
+            table_lancamento.refresh();
+
+            // Limpar os campos de entrada de texto
+            nome.clear();
+            ano.clear();
+            porte.clear();
+        } catch (SQLException e) {
+            System.err.println("Erro ao atualizar pessoa: " + e.getMessage());
+        }
+    }
+
 }

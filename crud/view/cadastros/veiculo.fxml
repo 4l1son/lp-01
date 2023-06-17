@@ -11,13 +11,13 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="609.0" prefWidth="944.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.ViagemController">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="609.0" prefWidth="944.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.VeiculoController">
   <children>
     <SplitPane centerShape="false" dividerPositions="0.11587436332767402" focusTraversable="true" prefHeight="-1.0" prefWidth="-1.0" styleClass="window" VBox.vgrow="ALWAYS">
       <items>
         <AnchorPane maxWidth="-Infinity" minHeight="580.0" minWidth="-Infinity" prefHeight="580.0" prefWidth="100.0" style="-fx-background-color: #993399;" styleClass="sidebar" SplitPane.resizableWithParent="false">
                <children>
-                  <Button layoutX="-13.0" layoutY="525.0" minWidth="46.0" mnemonicParsing="false" onAction="#irMenu" prefHeight="76.0" prefWidth="126.0" scaleX="0.5" scaleY="0.5" styleClass="rp-column" text="Sair">
+                  <Button layoutX="-13.0" layoutY="525.0" minWidth="46.0" mnemonicParsing="false" onAction="#irMenu" prefHeight="76.0" prefWidth="126.0" scaleX="0.5" scaleY="0.5" style="-fx-background-color: #000000;" styleClass="rp-column" text="Sair" textFill="WHITE">
                      <font>
                         <Font size="32.0" />
                      </font></Button>
@@ -28,9 +28,9 @@
               <children>
                         <TableView fx:id="table_lancamento" centerShape="false" editable="true" layoutX="18.0" layoutY="115.0" prefHeight="401.0" prefWidth="555.0" AnchorPane.leftAnchor="18.0" AnchorPane.rightAnchor="271.0">
                           <columns>
-                              <TableColumn fx:id="col_inicio" prefWidth="111.20001220703125" styleClass="rp-column" text="Nome" />
-                              <TableColumn fx:id="col_fim" prefWidth="75.0" styleClass="rp-column" text="Porte" />
-                              <TableColumn fx:id="col_justificativa" prefWidth="75.0" styleClass="rp-column" text="Ano" />
+                              <TableColumn fx:id="col_nome" prefWidth="111.20001220703125" styleClass="rp-column" text="Nome" />
+                              <TableColumn fx:id="col_porte" prefWidth="75.0" styleClass="rp-column" text="Porte" />
+                              <TableColumn fx:id="col_ano" prefWidth="75.0" styleClass="rp-column" text="Ano" />
                              
                               <TableColumn fx:id="col_id" editable="false" prefWidth="93.6000394821167" styleClass="rp-column" text="ID" visible="false" />
                           </columns>
@@ -44,15 +44,15 @@
                            </font>
                         </Label>
                         <Button fx:id="btn_lancar" layoutX="607.0" layoutY="433.0" mnemonicParsing="false" onAction="#irLancar" prefHeight="52.0" prefWidth="186.0" style="-fx-background-color: c040ed; -fx-background-radius: 10%;" styleClass="MYButton" text="Lançar" />
-                        <TextField fx:id="inicio" layoutX="615.0" layoutY="167.0" prefHeight="38.0" prefWidth="170.0" promptText="Nome" />
-                        <TextField fx:id="fim" layoutX="612.0" layoutY="242.0" prefHeight="38.0" prefWidth="174.0" promptText="Porte" />
-                        <TextField fx:id="destino" layoutX="611.0" layoutY="303.0" prefHeight="38.0" prefWidth="177.0" promptText="Ano" />
-                       <Button fx:id="btn_lancar1" layoutX="64.0" layoutY="527.0" mnemonicParsing="false" onAction="#excluirLancamento" prefHeight="52.0" prefWidth="100.0" style="-fx-background-color: c040ed; -fx-background-radius: 10%;" styleClass="MYButton" text="Deletar">
+                        <TextField fx:id="nome" layoutX="615.0" layoutY="167.0" prefHeight="38.0" prefWidth="170.0" promptText="Nome" />
+                        <TextField fx:id="porte" layoutX="612.0" layoutY="242.0" prefHeight="38.0" prefWidth="174.0" promptText="Porte" />
+                        <TextField fx:id="ano" layoutX="611.0" layoutY="303.0" prefHeight="38.0" prefWidth="177.0" promptText="Ano" />
+                       <Button fx:id="btn_lancar" layoutX="64.0" layoutY="527.0" mnemonicParsing="false" onAction="#excluirLancamento" prefHeight="52.0" prefWidth="100.0" style="-fx-background-color: c040ed; -fx-background-radius: 10%;" styleClass="MYButton" text="Deletar">
                            <font>
                               <Font size="18.0" />
                            </font>
                         </Button>
-                        <Button fx:id="btn_lancar11" layoutX="181.0" layoutY="527.0" mnemonicParsing="false" onAction="#atualizarLancamento" prefHeight="52.0" prefWidth="100.0" style="-fx-background-color: c040ed; -fx-background-radius: 10%;" styleClass="MYButton" text="Atualizar">
+                        <Button fx:id="btn_lancar" layoutX="181.0" layoutY="527.0" mnemonicParsing="false" onAction="#atualizarLancamento" prefHeight="52.0" prefWidth="100.0" style="-fx-background-color: c040ed; -fx-background-radius: 10%;" styleClass="MYButton" text="Atualizar">
                            <font>
                               <Font size="18.0" />
                            </font>

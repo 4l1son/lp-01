@@ -1,6 +1,5 @@
 package Controller;
 
-
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -15,14 +14,13 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-
+import Conexao.Factory;
 import java.io.IOException;
 import java.net.URL;
+import java.sql.*;
 import java.util.ResourceBundle;
 
-
 public class PessoaController implements Initializable {
-
     @FXML
     private TextField CPF;
 
@@ -52,6 +50,7 @@ public class PessoaController implements Initializable {
 
     private ObservableList<Lancamento> tableData;
 
+    private Connection con;
 
     @FXML
     void irLancar(ActionEvent event) {
@@ -59,20 +58,34 @@ public class PessoaController implements Initializable {
         String idadeText = idade.getText();
         String CPFText = CPF.getText();
 
-        // Criar um objeto Lancamento com os dados fornecidos
-        Lancamento lancamento = new Lancamento(nomeText, idadeText, CPFText);
+        try {
+            PreparedStatement stmt = con.prepareStatement("INSERT INTO pessoa (nome, idade, cpf) VALUES (?, ?, ?)");
+            stmt.setString(1, nomeText);
+            stmt.setString(2, idadeText);
+            stmt.setString(3, CPFText);
+            stmt.executeUpdate();
+            stmt.close();
 
-        // Adicionar o objeto Lancamento à lista observável
-        tableData.add(lancamento);
+            // Criar um objeto Lancamento com os dados fornecidos
+            Lancamento lancamento = new Lancamento(nomeText, idadeText, CPFText);
 
-        // Limpar os campos de entrada de texto
-        nome.clear();
-        idade.clear();
-        CPF.clear();
+            // Adicionar o objeto Lancamento à lista observável
+            tableData.add(lancamento);
+
+            // Limpar os campos de entrada de texto
+            nome.clear();
+            idade.clear();
+            CPF.clear();
+        } catch (SQLException e) {
+            System.err.println("Erro ao inserir lançamento: " + e.getMessage());
+        }
     }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        Factory factory = new Factory();
+        con = factory.getConnection();
+
         // Configurar as colunas da tabela
         col_nome.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getNome()));
         col_idade.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getIdade()));
@@ -80,6 +93,22 @@ public class PessoaController implements Initializable {
 
         // Criar uma lista observável para armazenar os dados da tabela
         tableData = FXCollections.observableArrayList();
+
+        try {
+            // Carregar os dados do banco para a lista observável
+            Statement stmt = con.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT * FROM pessoa");
+            while (rs.next()) {
+                String nomeText = rs.getString("nome");
+                String idadeText = rs.getString("idade");
+                String CPFText = rs.getString("cpf");
+                Lancamento lancamento = new Lancamento(nomeText, idadeText, CPFText);
+                tableData.add(lancamento);
+            }
+            stmt.close();
+        } catch (SQLException e) {
+            System.err.println("Erro ao carregar lançamentos: " + e.getMessage());
+        }
 
         // Atribuir a lista observável à tabela
         table_lancamento.setItems(tableData);
@@ -108,6 +137,7 @@ public class PessoaController implements Initializable {
         public String getCPF() {
             return CPF.get();
         }
+
         public void setNome(String nomeText) {
             nome.set(nomeText);
         }
@@ -120,7 +150,7 @@ public class PessoaController implements Initializable {
             CPF.set(CPFText);
         }
     }
-    
+
     @FXML
     public void irMenu() {
         // Carregar o arquivo FXML do menu
@@ -150,27 +180,6 @@ public class PessoaController implements Initializable {
     @FXML
     void excluirLancamento(ActionEvent event) {
         // Verificar se um item da tabela está selecionado
-        Lancamento selecionado = (Lancamento) table_lancamento.getSelectionModel().getSelectedItem();
-        
-
-        // Exibir uma mensagem de confirmação para o usuário
-       
-      
-            // Remover o objeto selecionado da lista observável
-            tableData.remove(selecionado);
-
-            // Limpar os campos de entrada de texto
-            nome.clear();
-            idade.clear();
-            CPF.clear();
-
-            
-    }
-    
-
-    @FXML
-    void atualizarLancamento(ActionEvent event) {
-        // Verificar se um item da tabela está selecionado
         Lancamento selecionado = table_lancamento.getSelectionModel().getSelectedItem();
         if (selecionado == null) {
             // Nenhum item selecionado, exibir uma mensagem de erro ou aviso
@@ -178,24 +187,64 @@ public class PessoaController implements Initializable {
             return;
         }
 
-        // Obter os novos valores dos campos de entrada de texto
-        String novoDestino = nome.getText();
-        String novoFim = idade.getText();
-        String novoInicio = CPF.getText();
+        try {
+            // Remover o objeto selecionado do banco de dados
+            PreparedStatement stmt = con.prepareStatement("DELETE FROM pessoa WHERE cpf = ?");
+            stmt.setString(1, selecionado.getCPF());
+            stmt.executeUpdate();
+            stmt.close();
 
-        // Atualizar os valores do lançamento selecionado
-        selecionado.setNome(novoDestino);
-        selecionado.setIdade(novoFim);
-        selecionado.setCPF(novoInicio);
+            // Remover o objeto selecionado da lista observável
+            tableData.remove(selecionado);
 
-        // Atualizar a tabela para refletir as alterações
-        table_lancamento.refresh();
-
-        // Limpar os campos de entrada de texto
-        nome.clear();
-        idade.clear();
-        CPF.clear();
+            // Limpar os campos de entrada de texto
+            nome.clear();
+            idade.clear();
+            CPF.clear();
+        } catch (SQLException e) {
+            System.err.println("Erro ao excluir lançamento: " + e.getMessage());
+        }
     }
-   
+    @FXML
+    void atualizarLancamento(ActionEvent event) {
+        // Verificar se uma pessoa da tabela está selecionada
+        Lancamento selecionada = table_lancamento.getSelectionModel().getSelectedItem();
+        if (selecionada == null) {
+            // Nenhuma pessoa selecionada, exibir uma mensagem de erro ou aviso
+            System.out.println("Nenhuma pessoa selecionada.");
+            return;
+        }
+
+        try {
+            // Obter os novos valores dos campos de entrada de texto
+            String novoNome = nome.getText();
+           String novaIdade = idade.getText();
+            String novoCpf = CPF.getText();
+
+            // Atualizar os valores da pessoa selecionada no banco de dados
+            PreparedStatement stmt = con.prepareStatement("UPDATE pessoa SET nome = ?, idade = ?, cpf = ? WHERE cpf = ?");
+            stmt.setString(1, novoNome);
+            stmt.setString(2, novaIdade);
+            stmt.setString(3, novoCpf);
+            stmt.setString(4, selecionada.getCPF());
+            stmt.executeUpdate();
+            stmt.close();
+
+            // Atualizar os valores da pessoa selecionada na tabela
+            selecionada.setNome(novoNome);
+            selecionada.setIdade(novaIdade);
+            selecionada.setCPF(novoCpf);
+
+            // Atualizar a tabela para refletir as alterações
+            table_lancamento.refresh();
+
+            // Limpar os campos de entrada de texto
+            nome.clear();
+            idade.clear();
+            CPF.clear();
+        } catch (SQLException e) {
+            System.err.println("Erro ao atualizar pessoa: " + e.getMessage());
+        }
+    }
 
 }

@@ -14,115 +14,143 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-
+import Conexao.Factory;
 import java.io.IOException;
 import java.net.URL;
+import java.sql.*;
 import java.util.ResourceBundle;
+
 public class ViagemController implements Initializable {
+    @FXML
+    private TextField inicio;
 
     @FXML
     private Button btn_lancar;
 
     @FXML
-    private TableColumn<Lancamento, String> col_fim;
+    private TableColumn<Lancamento, String> col_inicio;
 
     @FXML
     private TableColumn<Lancamento, String> col_id;
 
     @FXML
-    private TableColumn<Lancamento, String> col_inicio;
+    private TableColumn<Lancamento, String> col_fim;
 
     @FXML
-    private TableColumn<Lancamento, String> col_justificativa;
-
-    @FXML
-    private TableColumn<Lancamento, String> col_motivo;
-
-    @FXML
-    private TextField destino;
+    private TableColumn<Lancamento, String> col_destino;
 
     @FXML
     private TextField fim;
 
     @FXML
-    private TextField inicio;
+    private TextField destino;
 
     @FXML
     private TableView<Lancamento> table_lancamento;
 
     private ObservableList<Lancamento> tableData;
 
+    private Connection con;
+
     @FXML
     void irLancar(ActionEvent event) {
-        String destinoText = destino.getText();
-        String fimText = fim.getText();
         String inicioText = inicio.getText();
+        String fimText = fim.getText();
+        String destinoText = destino.getText();
 
-        // Criar um objeto Lancamento com os dados fornecidos
-        Lancamento lancamento = new Lancamento(destinoText, fimText, inicioText);
+        try {
+            PreparedStatement stmt = con.prepareStatement("INSERT INTO viagem (inicio, fim, destino) VALUES (?, ?, ?)");
+            stmt.setString(1, inicioText);
+            stmt.setString(2, fimText);
+            stmt.setString(3, destinoText);
+            stmt.executeUpdate();
+            stmt.close();
 
-        // Adicionar o objeto Lancamento à lista observável
-        tableData.add(lancamento);
+            // Criar um objeto Lancamento com os dados fornecidos
+            Lancamento lancamento = new Lancamento(inicioText, fimText, destinoText);
 
-        // Limpar os campos de entrada de texto
-        destino.clear();
-        fim.clear();
-        inicio.clear();
+            // Adicionar o objeto Lancamento à lista observável
+            tableData.add(lancamento);
+
+            // Limpar os campos de entrada de texto
+            inicio.clear();
+            fim.clear();
+            destino.clear();
+        } catch (SQLException e) {
+            System.err.println("Erro ao inserir lançamento: " + e.getMessage());
+        }
     }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        Factory factory = new Factory();
+        con = factory.getConnection();
+
         // Configurar as colunas da tabela
-        col_justificativa.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getDestino()));
         col_inicio.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getInicio()));
         col_fim.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getFim()));
+        col_destino.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getDestino()));
 
         // Criar uma lista observável para armazenar os dados da tabela
         tableData = FXCollections.observableArrayList();
 
+        try {
+            // Carregar os dados do banco para a lista observável
+            Statement stmt = con.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT * FROM viagem");
+            while (rs.next()) {
+                String inicioText = rs.getString("inicio");
+                String fimText = rs.getString("fim");
+                String destinoText = rs.getString("destino");
+                Lancamento lancamento = new Lancamento(inicioText, fimText, destinoText);
+                tableData.add(lancamento);
+            }
+            stmt.close();
+        } catch (SQLException e) {
+            System.err.println("Erro ao carregar lançamentos: " + e.getMessage());
+        }
+
         // Atribuir a lista observável à tabela
         table_lancamento.setItems(tableData);
     }
-    
 
     // Classe Lancamento que representa uma linha de dados
     private static class Lancamento {
-        private final SimpleStringProperty destino;
-        private final SimpleStringProperty fim;
         private final SimpleStringProperty inicio;
+        private final SimpleStringProperty fim;
+        private final SimpleStringProperty destino;
 
-        public Lancamento(String destino, String fim, String inicio) {
-            this.destino = new SimpleStringProperty(destino);
-            this.fim = new SimpleStringProperty(fim);
+        public Lancamento(String inicio, String fim, String destino) {
             this.inicio = new SimpleStringProperty(inicio);
-        }
-
-        public String getDestino() {
-            return destino.get();
-        }
-
-        public String getFim() {
-            return fim.get();
+            this.fim = new SimpleStringProperty(fim);
+            this.destino = new SimpleStringProperty(destino);
         }
 
         public String getInicio() {
             return inicio.get();
         }
 
-        public void setDestino(String novoDestino) {
-            destino.set(novoDestino);
+        public String getFim() {
+            return fim.get();
         }
 
-        public void setFim(String novoFim) {
-            fim.set(novoFim);
+        public String getDestino() {
+            return destino.get();
         }
 
-        public void setInicio(String novoInicio) {
-            inicio.set(novoInicio);
+        public void setInicio(String inicioText) {
+            inicio.set(inicioText);
+        }
+
+        public void setFim(String fimText) {
+            fim.set(fimText);
+        }
+
+        public void setDestino(String destinoText) {
+            destino.set(destinoText);
         }
     }
-    
-  
+
     @FXML
     public void irMenu() {
         // Carregar o arquivo FXML do menu
@@ -148,28 +176,9 @@ public class ViagemController implements Initializable {
             System.err.println(e);
         }
     }
+
     @FXML
     void excluirLancamento(ActionEvent event) {
-        // Verificar se um item da tabela está selecionado
-        Lancamento selecionado = (Lancamento) table_lancamento.getSelectionModel().getSelectedItem();
-        
-
-        // Exibir uma mensagem de confirmação para o usuário
-       
-      
-            // Remover o objeto selecionado da lista observável
-            tableData.remove(selecionado);
-
-            // Limpar os campos de entrada de texto
-            destino.clear();
-            fim.clear();
-            inicio.clear();
-
-            
-    }
-   
-    @FXML
-    void atualizarLancamento(ActionEvent event) {
         // Verificar se um item da tabela está selecionado
         Lancamento selecionado = table_lancamento.getSelectionModel().getSelectedItem();
         if (selecionado == null) {
@@ -178,29 +187,64 @@ public class ViagemController implements Initializable {
             return;
         }
 
-        // Obter os novos valores dos campos de entrada de texto
-        String novoDestino = destino.getText();
-        String novoFim = fim.getText();
-        String novoInicio = inicio.getText();
+        try {
+            // Remover o objeto selecionado do banco de dados
+            PreparedStatement stmt = con.prepareStatement("DELETE FROM viagem WHERE destino = ?");
+            stmt.setString(1, selecionado.getDestino());
+            stmt.executeUpdate();
+            stmt.close();
 
-        // Atualizar os valores do lançamento selecionado
-        selecionado.setDestino(novoDestino);
-        selecionado.setFim(novoFim);
-        selecionado.setInicio(novoInicio);
+            // Remover o objeto selecionado da lista observável
+            tableData.remove(selecionado);
 
-        // Atualizar a tabela para refletir as alterações
-        table_lancamento.refresh();
-
-        // Limpar os campos de entrada de texto
-        destino.clear();
-        fim.clear();
-        inicio.clear();
+            // Limpar os campos de entrada de texto
+            inicio.clear();
+            fim.clear();
+            destino.clear();
+        } catch (SQLException e) {
+            System.err.println("Erro ao excluir lançamento: " + e.getMessage());
+        }
     }
-   
+    @FXML
+    void atualizarLancamento(ActionEvent event) {
+        // Verificar se uma pessoa da tabela está selecionada
+        Lancamento selecionada = table_lancamento.getSelectionModel().getSelectedItem();
+        if (selecionada == null) {
+            // Nenhuma pessoa selecionada, exibir uma mensagem de erro ou aviso
+            System.out.println("Nenhuma pessoa selecionada.");
+            return;
+        }
 
+        try {
+            // Obter os novos valores dos campos de entrada de texto
+            String novoInicio = inicio.getText();
+            String novoFim = fim.getText();
+            String novoDestino = destino.getText();
 
+            // Atualizar os valores da pessoa selecionada no banco de dados
+            PreparedStatement stmt = con.prepareStatement("UPDATE viagem SET inicio = ?, fim = ?, destino = ? WHERE destino = ?");
+            stmt.setString(1, novoInicio);
+            stmt.setString(2, novoFim);
+            stmt.setString(3, novoDestino);
+            stmt.setString(4, selecionada.getDestino());
+            stmt.executeUpdate();
+            stmt.close();
 
+            // Atualizar os valores da pessoa selecionada na tabela
+            selecionada.setInicio(novoInicio);
+            selecionada.setFim(novoFim);
+            selecionada.setDestino(novoDestino);
+
+            // Atualizar a tabela para refletir as alterações
+            table_lancamento.refresh();
+
+            // Limpar os campos de entrada de texto
+            inicio.clear();
+            fim.clear();
+            destino.clear();
+        } catch (SQLException e) {
+            System.err.println("Erro ao atualizar pessoa: " + e.getMessage());
+        }
+    }
 
 }
-
-

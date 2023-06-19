@@ -1,0 +1,76 @@
+/* Estilo para a janela */
+.window {
+    -fx-background-color: #FFFFFF;
+}
+
+/* Estilo para a barra lateral */
+.sidebar {
+    -fx-background-color: linear-gradient(to bottom, #f15ff1, #1d0315);
+}
+
+/* Estilo para o conteúdo principal */
+.content {
+    -fx-background-color: #FFFFFF;
+}
+
+/* Estilo para os botões */
+.button {
+    -fx-background-color: #FFFFFF;
+    -fx-text-fill: #503f3f;
+    -fx-font-size: 18.0;
+}
+
+.button:hover {
+    -fx-background-color: #ebe1e1;
+}
+
+/* Estilo para o texto principal */
+.label {
+    -fx-text-fill: #f15ff1;
+    -fx-font-size: 30.0;
+}
+
+/* Estilo para os campos de texto */
+.text-field {
+    -fx-prompt-text-fill: #000000;
+}
+
+/* Estilo para o botão de lançar */
+#irLancar {
+    -fx-background-color: #c040ed;
+}
+
+/* Estilo para o botão de deletar */
+#btn_lancar1 {
+    -fx-background-color: #f15ff1;
+    -fx-background-radius: 10%;
+    -fx-font-size: 18.0;
+}
+
+/* Estilo para o botão de atualizar */
+#btn_lancar11 {
+    -fx-background-color: #f15ff1;
+    -fx-background-radius: 10%;
+    -fx-font-size: 18.0;
+}
+
+/* Estilo para as colunas da tabela */
+.table-view .rp-column {
+    -fx-alignment: CENTER_LEFT;
+}
+
+/* Estilo para o efeito de redimensionamento das colunas */
+.table-view .column-resize-policy {
+    -fx-pref-width: 1.0;
+}
+
+/* Estilo para o conteúdo da tabela */
+#Content {
+    -fx-min-height: 578.0;
+    -fx-min-width: 810.0;
+}
+
+/* Estilo para o retângulo da tabela */
+.table-view .table-cell .text {
+    -fx-fill: black;
+}

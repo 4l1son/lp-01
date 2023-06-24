@@ -1,9 +1,11 @@
 package DAO;
 
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+
+import Conexao.Factory;
+import Controller.PessoaController.Lancamento;
 
 public class PessoaDAO {
     private Connection connection;
@@ -12,11 +14,15 @@ public class PessoaDAO {
         this.connection = connection;
     }
 
-    public void salvar(String nome, String idade, String CPF) {
-        String sql = "INSERT INTO pessoa (nome, idade, CPF) VALUES (?, ?, ?)";
+    public PessoaDAO() {
+        this.connection = Factory.getConnection();
+    }
+
+    public void salvar(String nome, String email, String CPF) {
+        String sql = "INSERT INTO pessoa (nome, email, CPF) VALUES (?, ?, ?)";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, nome);
-            statement.setString(2, idade);
+            statement.setString(2, email);
             statement.setString(3, CPF);
             statement.executeUpdate();
         } catch (SQLException e) {
@@ -24,23 +30,23 @@ public class PessoaDAO {
         }
     }
 
-    public void excluir(int id) {
-        String sql = "DELETE FROM pessoa WHERE id = ?";
+    public void excluir(Lancamento selecionado) {
+        String sql = "DELETE FROM pessoa WHERE CPF = ?";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setInt(1, id);
+            statement.setString(1, selecionado.getCPF());
             statement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    public void atualizar(int id, String nome, String idade, String CPF) {
-        String sql = "UPDATE pessoa SET nome = ?, idade = ?, CPF = ? WHERE id = ?";
+    public void atualizar(Lancamento selecionada, String nome, String email, String CPF) {
+        String sql = "UPDATE pessoa SET nome = ?, email = ?, CPF = ? WHERE CPF = ?";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, nome);
-            statement.setString(2, idade);
+            statement.setString(2, email);
             statement.setString(3, CPF);
-            statement.setInt(4, id);
+            statement.setString(4, selecionada.getCPF());
             statement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();

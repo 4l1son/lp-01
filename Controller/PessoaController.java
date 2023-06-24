@@ -15,6 +15,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import Conexao.Factory;
+import DAO.PessoaDAO;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.*;
@@ -53,32 +54,23 @@ public class PessoaController implements Initializable {
     private Connection con;
 
     @FXML
-    void irLancar(ActionEvent event) {
+    void irLancar(ActionEvent event) throws SQLException {
         String nomeText = nome.getText();
         String idadeText = idade.getText();
         String CPFText = CPF.getText();
+        PessoaDAO pessoa = new PessoaDAO(con);
+        pessoa.salvar(nomeText, idadeText, CPFText);
 
-        try {
-            PreparedStatement stmt = con.prepareStatement("INSERT INTO pessoa (nome, idade, cpf) VALUES (?, ?, ?)");
-            stmt.setString(1, nomeText);
-            stmt.setString(2, idadeText);
-            stmt.setString(3, CPFText);
-            stmt.executeUpdate();
-            stmt.close();
+        // Criar um objeto Lancamento com os dados fornecidos
+        Lancamento lancamento = new Lancamento(nomeText, idadeText, CPFText);
 
-            // Criar um objeto Lancamento com os dados fornecidos
-            Lancamento lancamento = new Lancamento(nomeText, idadeText, CPFText);
+        // Adicionar o objeto Lancamento à lista observável
+        tableData.add(lancamento);
 
-            // Adicionar o objeto Lancamento à lista observável
-            tableData.add(lancamento);
-
-            // Limpar os campos de entrada de texto
-            nome.clear();
-            idade.clear();
-            CPF.clear();
-        } catch (SQLException e) {
-            System.err.println("Erro ao inserir lançamento: " + e.getMessage());
-        }
+        // Limpar os campos de entrada de texto
+        nome.clear();
+        idade.clear();
+        CPF.clear();
     }
 
     @Override
@@ -100,8 +92,8 @@ public class PessoaController implements Initializable {
             ResultSet rs = stmt.executeQuery("SELECT * FROM pessoa");
             while (rs.next()) {
                 String nomeText = rs.getString("nome");
-                String idadeText = rs.getString("idade");
-                String CPFText = rs.getString("cpf");
+                String idadeText = rs.getString("email");
+                String CPFText = rs.getString("CPF");
                 Lancamento lancamento = new Lancamento(nomeText, idadeText, CPFText);
                 tableData.add(lancamento);
             }
@@ -115,7 +107,7 @@ public class PessoaController implements Initializable {
     }
 
     // Classe Lancamento que representa uma linha de dados
-    private static class Lancamento {
+    public static class Lancamento {
         private final SimpleStringProperty nome;
         private final SimpleStringProperty idade;
         private final SimpleStringProperty CPF;
@@ -178,7 +170,7 @@ public class PessoaController implements Initializable {
     }
 
     @FXML
-    void excluirLancamento(ActionEvent event) {
+    void excluirLancamento(ActionEvent event) throws SQLException {
         // Verificar se um item da tabela está selecionado
         Lancamento selecionado = table_lancamento.getSelectionModel().getSelectedItem();
         if (selecionado == null) {
@@ -187,26 +179,21 @@ public class PessoaController implements Initializable {
             return;
         }
 
-        try {
-            // Remover o objeto selecionado do banco de dados
-            PreparedStatement stmt = con.prepareStatement("DELETE FROM pessoa WHERE cpf = ?");
-            stmt.setString(1, selecionado.getCPF());
-            stmt.executeUpdate();
-            stmt.close();
+        // Remover o objeto selecionado do banco de dados
+        PessoaDAO pessoa = new PessoaDAO(con);
+        pessoa.excluir(selecionado);
 
-            // Remover o objeto selecionado da lista observável
-            tableData.remove(selecionado);
+        // Remover o objeto selecionado da lista observável
+        tableData.remove(selecionado);
 
-            // Limpar os campos de entrada de texto
-            nome.clear();
-            idade.clear();
-            CPF.clear();
-        } catch (SQLException e) {
-            System.err.println("Erro ao excluir lançamento: " + e.getMessage());
-        }
+        // Limpar os campos de entrada de texto
+        nome.clear();
+        idade.clear();
+        CPF.clear();
     }
+
     @FXML
-    void atualizarLancamento(ActionEvent event) {
+    void atualizarLancamento(ActionEvent event) throws SQLException {
         // Verificar se uma pessoa da tabela está selecionada
         Lancamento selecionada = table_lancamento.getSelectionModel().getSelectedItem();
         if (selecionada == null) {
@@ -215,36 +202,27 @@ public class PessoaController implements Initializable {
             return;
         }
 
-        try {
-            // Obter os novos valores dos campos de entrada de texto
-            String novoNome = nome.getText();
-           String novaIdade = idade.getText();
-            String novoCpf = CPF.getText();
+        // Obter os novos valores dos campos de entrada de texto
+        String novoNome = nome.getText();
+        String novaIdade = idade.getText();
+        String novoCpf = CPF.getText();
 
-            // Atualizar os valores da pessoa selecionada no banco de dados
-            PreparedStatement stmt = con.prepareStatement("UPDATE pessoa SET nome = ?, idade = ?, cpf = ? WHERE cpf = ?");
-            stmt.setString(1, novoNome);
-            stmt.setString(2, novaIdade);
-            stmt.setString(3, novoCpf);
-            stmt.setString(4, selecionada.getCPF());
-            stmt.executeUpdate();
-            stmt.close();
+        // Atualizar os valores da pessoa selecionada no banco de dados
+        PessoaDAO pessoa = new PessoaDAO(con);
+        pessoa.atualizar(selecionada, novoNome, novaIdade, novoCpf);
 
-            // Atualizar os valores da pessoa selecionada na tabela
-            selecionada.setNome(novoNome);
-            selecionada.setIdade(novaIdade);
-            selecionada.setCPF(novoCpf);
+        // Atualizar os valores da pessoa selecionada na tabela
+        selecionada.setNome(novoNome);
+        selecionada.setIdade(novaIdade);
+        selecionada.setCPF(novoCpf);
 
-            // Atualizar a tabela para refletir as alterações
-            table_lancamento.refresh();
+        // Atualizar a tabela para refletir as alterações
+        table_lancamento.refresh();
 
-            // Limpar os campos de entrada de texto
-            nome.clear();
-            idade.clear();
-            CPF.clear();
-        } catch (SQLException e) {
-            System.err.println("Erro ao atualizar pessoa: " + e.getMessage());
-        }
+        // Limpar os campos de entrada de texto
+        nome.clear();
+        idade.clear();
+        CPF.clear();
     }
 
 }

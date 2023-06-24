@@ -19,7 +19,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.sql.*;
 import java.util.ResourceBundle;
-
+import DAO.VeiculoDAO;
+import DAO.ViagemDAO;
 public class VeiculoController implements Initializable {
     @FXML
     private TextField nome;
@@ -51,35 +52,6 @@ public class VeiculoController implements Initializable {
     private ObservableList<Lancamento> tableData;
 
     private Connection con;
-
-    @FXML
-    void irLancar(ActionEvent event) {
-        String nomeText = nome.getText();
-        String porteText = porte.getText();
-        String anoText = ano.getText();
-
-        try {
-            PreparedStatement stmt = con.prepareStatement("INSERT INTO veiculo (nome, porte, ano) VALUES (?, ?, ?)");
-            stmt.setString(1, nomeText);
-            stmt.setString(2, porteText);
-            stmt.setString(3, anoText);
-            stmt.executeUpdate();
-            stmt.close();
-
-            // Criar um objeto Lancamento com os dados fornecidos
-            Lancamento lancamento = new Lancamento(nomeText, porteText, anoText);
-
-            // Adicionar o objeto Lancamento à lista observável
-            tableData.add(lancamento);
-
-            // Limpar os campos de entrada de texto
-            nome.clear();
-            porte.clear();
-            ano.clear();
-        } catch (SQLException e) {
-            System.err.println("Erro ao inserir lançamento: " + e.getMessage());
-        }
-    }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -178,7 +150,33 @@ public class VeiculoController implements Initializable {
     }
 
     @FXML
-    void excluirLancamento(ActionEvent event) {
+    void irLancar(ActionEvent event) throws SQLException {
+        String nomeText = nome.getText();
+        String porteText = porte.getText();
+        String anoText = ano.getText();
+
+        VeiculoDAO veiculo = new VeiculoDAO(con);
+		 
+		veiculo.salvar(nomeText, porteText, anoText);;
+
+		// Criar um objeto Lancamento com os dados fornecidos
+		Lancamento lancamento = new Lancamento(nomeText, porteText, anoText);
+		
+		// Adicionar o objeto Lancamento à lista observável
+		tableData.add(lancamento);
+
+		// Limpar os campos de entrada de texto
+		nome.clear();
+		porte.clear();
+		ano.clear();
+    }
+
+    
+
+
+    
+    @FXML
+    void excluirLancamento(ActionEvent event) throws SQLException {
         // Verificar se um item da tabela está selecionado
         Lancamento selecionado = table_lancamento.getSelectionModel().getSelectedItem();
         if (selecionado == null) {
@@ -187,26 +185,20 @@ public class VeiculoController implements Initializable {
             return;
         }
 
-        try {
-            // Remover o objeto selecionado do banco de dados
-            PreparedStatement stmt = con.prepareStatement("DELETE FROM pessoa WHERE ano = ?");
-            stmt.setString(1, selecionado.getAno());
-            stmt.executeUpdate();
-            stmt.close();
+        VeiculoDAO veiculo = new VeiculoDAO(con);
+		veiculo.excluir(selecionado.getAno());
 
-            // Remover o objeto selecionado da lista observável
-            tableData.remove(selecionado);
+		// Remover o objeto selecionado da lista observável
+		tableData.remove(selecionado);
 
-            // Limpar os campos de entrada de texto
-            nome.clear();
-            porte.clear();
-            ano.clear();
-        } catch (SQLException e) {
-            System.err.println("Erro ao excluir lançamento: " + e.getMessage());
-        }
+		// Limpar os campos de entrada de texto
+		nome.clear();
+		porte.clear();
+		ano.clear();
     }
+
     @FXML
-    void atualizarLancamento(ActionEvent event) {
+    void atualizarLancamento(ActionEvent event) throws SQLException {
         // Verificar se uma pessoa da tabela está selecionada
         Lancamento selecionada = table_lancamento.getSelectionModel().getSelectedItem();
         if (selecionada == null) {
@@ -215,36 +207,25 @@ public class VeiculoController implements Initializable {
             return;
         }
 
-        try {
-            // Obter os novos valores dos campos de entrada de texto
-            String novoNome = nome.getText();
-            String novoAno = ano.getText();
-            String novoPorte = porte.getText();
+        // Obter os novos valores dos campos de entrada de texto
+		String novoNome = nome.getText();
+		String novoAno = ano.getText();
+		String novoPorte = porte.getText();
+		VeiculoDAO veiculo = new VeiculoDAO(con);
 
-            // Atualizar os valores da pessoa selecionada no banco de dados
-            PreparedStatement stmt = con.prepareStatement("UPDATE veiculo SET nome = ?, ano = ?, porte = ? WHERE porte = ?");
-            stmt.setString(1, novoNome);
-            stmt.setString(2, novoAno);
-            stmt.setString(3, novoPorte);
-            stmt.setString(4, selecionada.getPorte());
-            stmt.executeUpdate();
-            stmt.close();
 
-            // Atualizar os valores da pessoa selecionada na tabela
-            selecionada.setNome(novoNome);
-            selecionada.setAno(novoAno);
-            selecionada.setPorte(novoPorte);
+		// Atualizar os valores da pessoa selecionada na tabela
+		selecionada.setNome(novoNome);
+		selecionada.setAno(novoAno);
+		selecionada.setPorte(novoPorte);
 
-            // Atualizar a tabela para refletir as alterações
-            table_lancamento.refresh();
+		// Atualizar a tabela para refletir as alterações
+		table_lancamento.refresh();
 
-            // Limpar os campos de entrada de texto
-            nome.clear();
-            ano.clear();
-            porte.clear();
-        } catch (SQLException e) {
-            System.err.println("Erro ao atualizar pessoa: " + e.getMessage());
-        }
+		// Limpar os campos de entrada de texto
+		nome.clear();
+		ano.clear();
+		porte.clear();
     }
 
 }

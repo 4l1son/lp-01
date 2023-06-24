@@ -10,7 +10,7 @@ public class Factory {
     private static final String USER = "root";
     private static final String PASSWORD = "";
 
-    private Connection connection;
+    private static Connection connection;
 
     public Factory() {
         try {
@@ -23,7 +23,7 @@ public class Factory {
         }
     }
 
-    public Connection getConnection() {
+    public static Connection getConnection() {
         return connection;
     }
 }
